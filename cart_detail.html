@@ -1,0 +1,175 @@
+<!-- store/templates/store/cart_detail.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Cart Details</title>
+    <!-- ✅ Bootstrap 5 CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+        h2 {
+            text-align: center;
+            color: #444;
+        }
+        .cart-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 20px;
+        }
+        .cart-card {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            width: 250px;
+            padding: 15px;
+            text-align: center;
+        }
+        .cart-card img {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+            border-radius: 4px;
+        }
+        .cart-card h3 {
+            margin: 10px 0 5px;
+            font-size: 18px;
+        }
+        .cart-card p {
+            margin: 5px 0;
+            font-size: 14px;
+            color: #333;
+        }
+        .remove-btn {
+            background-color: #dc3545;
+            border: none;
+            color: white;
+            padding: 8px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .remove-btn:hover {
+            background-color: #c82333;
+        }
+        .place-order-btn {
+            display: block;
+            margin: 30px auto 10px;
+            padding: 12px 24px;
+            font-size: 16px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+        .place-order-btn:hover {
+            background-color: #218838;
+        }
+        .continue-shopping {
+            text-align: center;
+            margin-top: 20px;
+        }
+        .continue-shopping a {
+            text-decoration: none;
+            color: #007bff;
+        }
+
+         .navbar-custom {
+            background-color: #343a40;
+        }
+
+        .navbar-custom .navbar-brand,
+        .navbar-custom .nav-link {
+            color: #f8f9fa;
+        }
+        .navbar-custom{
+        padding:0;
+        margin-right: 0;
+        margin-left:0;
+        }
+
+        .navbar-custom .nav-link:hover {
+            color: #ffc107;
+        }
+    </style>
+</head>
+<body>
+
+<!-- ✅ Responsive Bootstrap Navbar -->
+<nav class="navbar navbar-expand-lg navbar-custom">
+    <div class="container">
+        <a class="navbar-brand fw-bold" href="/">MyStore</a>
+        <button class="navbar-toggler text-white" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse justify-content-between" id="navbarNavDropdown">
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a class="nav-link" href="/">Home</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'cart_detail' %}">Cart</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'order_history' %}">My Order</a>
+                </li>
+            </ul>
+            <ul class="navbar-nav">
+                {% if user.is_authenticated %}
+                    <li class="nav-item">
+                        <span class="nav-link">Welcome, {{ user.username }}</span>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'logout' %}">Logout</a>
+                    </li>
+                {% else %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'login' %}">Login</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'register' %}">Register</a>
+                    </li>
+                {% endif %}
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<h2>🛒 Your Shopping Cart</h2>
+
+<div class="continue-shopping">
+    <a href="{% url 'product_list' %}">← Continue Shopping</a>
+</div>
+
+{% if cart_items %}
+    <div class="cart-container">
+        {% for item in cart_items %}
+            <div class="cart-card">
+                <a href="{% url 'product_detail' item.product.id %}">
+                    <img src="{{ item.product.image.url }}" alt="{{ item.product.name }}">
+                    <h3>{{ item.product.name }}</h3>
+                </a>
+                <p>Price: ₹{{ item.product.price }}</p>
+                <p>Quantity: {{ item.quantity }}</p>
+                <p>Total: ₹{{ item.total_price }}</p>
+                <form method="post" action="{% url 'remove_from_cart' item.product.id %}">
+                    {% csrf_token %}
+                    <button class="remove-btn">Remove</button>
+                </form>
+            </div>
+        {% endfor %}
+    </div>
+{% else %}
+    <p style="text-align:center;">🛒 Your cart is empty.</p>
+{% endif %}
+
+</body>
+</html>
